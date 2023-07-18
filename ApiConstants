@@ -1,0 +1,23 @@
+public class ApiConstants {
+    public static String APP_VERSION = "1.0.0.1";
+    public static final String BASE_URL="https://catfact.ninja/";
+
+    public static final String FACT="fact";
+
+}
+
+
+public interface ApiInterface {
+
+    @GET(ApiConstants.FACT)
+    Call<ResponseBody>getFact();
+
+    @FormUrlEncoded
+    @POST(ApiConstants.FACT)
+    Call<ResponseBody>getMemName(@FieldMap HashMap<String,String> mem);
+}
+
+public interface ApiResponse {
+    void OnResponse(String response,int apiRequest);
+    void OnError(String errorResponse,int apiRequest);
+}
