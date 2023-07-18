@@ -1,0 +1,35 @@
+private void getGoldScheme() {
+    ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+    Call<ResponseBody> call = apiInterface.getFact();
+    ApiClient.callApi(call, this, ApiConstants.FACT);
+}
+
+private void getMemberList() {
+    binding.pBar.setVisibility(View.VISIBLE);
+    ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+    HashMap<String, String> param = new HashMap<>();
+    param.put("UserType", "COLLECTOR");
+    param.put("CollectorCode", "EMP0001");
+    Call<ResponseBody> rbd = apiInterface.getMemName(param);
+    ApiClient.callApi(rbd, this, ApiConstants.apiRequest.GET_MEM_LIST);
+}
+
+if (apiRequest == ApiConstants.apiRequest.GET_GOLD_SCHEME) {
+    try {
+        JSONObject jsonObject = new JSONObject(response);
+        JSONArray jsonArray = jsonObject.getJSONArray("GoldLoanScheme");
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject object = jsonArray.getJSONObject(i);
+            goldSchemeList.add(object.optString("LoanName"));
+            schemeIdList.add(object.optString("LoanTableNo"));
+
+
+            ArrayAdapter adapter = new ArrayAdapter(this,
+                    androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, goldSchemeList);
+            binding.schemeSpinner.setAdapter(adapter);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
