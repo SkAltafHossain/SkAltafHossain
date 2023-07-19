@@ -1,0 +1,497 @@
+private void getGoldScheme() {
+        ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+        Call<ResponseBody> call = apiInterface.getgoldScheme();
+        ApiClient.callApi(call, this, ApiConstants.apiRequest.GET_GOLD_SCHEME);
+    }
+
+    private void getMemberList() {
+        binding.pBar.setVisibility(View.VISIBLE);
+        ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+        HashMap<String, String> param = new HashMap<>();
+        param.put("UserType", "COLLECTOR");
+        param.put("CollectorCode", "EMP0001");
+        Call<ResponseBody> rbd = apiInterface.getMemName(param);
+        ApiClient.callApi(rbd, this, ApiConstants.apiRequest.GET_MEM_LIST);
+    }
+
+    private void getTodayGoldRate(String carat) {
+        ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+        HashMap<String, String> param = new HashMap<>();
+        param.put("GoldType", carat);
+        Call<ResponseBody> rbd = apiInterface.getgoldRate(param);
+        ApiClient.callApi(rbd, this, ApiConstants.apiRequest.TODAY_GOLD_RATE);
+    }
+
+    private void getMemDetails(String memName) {
+        ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+        HashMap<String, String> param = new HashMap<>();
+        param.put("NameText", memName);
+        Call<ResponseBody> rbd = apiInterface.memDetails(param);
+        ApiClient.callApi(rbd, this, ApiConstants.apiRequest.MEM_DETAILS);
+    }
+
+    private void getGoldItem(String type) {
+        Log.e("55555555555555", "093874374");
+        ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+        HashMap<String, String> param = new HashMap<>();
+        param.put("Metal", type);
+        Call<ResponseBody> rbd = apiInterface.getGoldItem(param);
+        ApiClient.callApi(rbd, this, ApiConstants.apiRequest.GOLD_ITEM);
+
+    }
+
+    private void getSchemeDetails(final String schemeID) {
+        ApiInterface apiInterface = ApiClient.getApiInterFace(this);
+        HashMap<String, String> param = new HashMap<>();
+        param.put("SchemeId", schemeID);
+        Call<ResponseBody> rbd = apiInterface.schemeDeatails(param);
+        ApiClient.callApi(rbd, this, ApiConstants.apiRequest.SCHEME_DETAILS);
+    }
+
+
+    @Override
+    public void OnResponse(String response, int apiRequest) {
+        goldSchemeList.clear();
+        schemeIdList.clear();
+        if (apiRequest == ApiConstants.apiRequest.GET_GOLD_SCHEME) {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("GoldLoanScheme");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    goldSchemeList.add(object.optString("LoanName"));
+                    schemeIdList.add(object.optString("LoanTableNo"));
+
+
+                    ArrayAdapter adapter = new ArrayAdapter(this,
+                            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, goldSchemeList);
+                    binding.schemeSpinner.setAdapter(adapter);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (apiRequest == ApiConstants.apiRequest.GET_MEM_LIST) {
+            binding.pBar.setVisibility(View.GONE);
+            memNameList.clear();
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("MemberList");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    memNameList.add(object.optString("MemberName"));
+                    ArrayAdapter adapter2 = new ArrayAdapter(this,
+                            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, memNameList);
+                    binding.spinMem.setAdapter(adapter2);
+
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (apiRequest == ApiConstants.apiRequest.TODAY_GOLD_RATE) {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("TodayGoldRate");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    String s = object.optString("ConfigValue");
+                    binding.tvRateToday.setText(object.optString("ConfigValue"));
+                    //Log.e("0000000000000",s.toString());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (apiRequest == ApiConstants.apiRequest.MEM_DETAILS) {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("MemberDetails");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    binding.tvMemCode.setText(object.optString("MemberCode"));
+                    binding.tvMemName.setText(object.optString("MemberName"));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (apiRequest == ApiConstants.apiRequest.GOLD_ITEM) {
+            itemList.clear();
+            try {
+
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("GoldItemsList");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    itemList.add(object.optString("ItemName"));
+                    ArrayAdapter arrayAdapter = new ArrayAdapter(this,
+                            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, itemList);
+                    binding.spinItem.setAdapter(arrayAdapter);
+
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (apiRequest == ApiConstants.apiRequest.SCHEME_DETAILS) {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("LoanSchemeDetails");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    LTV = object.optString("LTVPercent");
+                    Log.e("589777777", object.optString("LTVPercent"));
+                }
+            } catch (Exception e) {
+
+            }
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+appp
+
+
+
+package com.example.owner.Utility;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+public class AppPreferences {
+    private static final  String USER_BRANCH_CODE="BRNCHCODE";
+    private static final  String USER_BRANCH="BRNCH";
+    private static final  String USER_OTP="OTP";
+    private static final  String Booking_Month="lastLogin";
+    private static final  String USER_NAME="name";
+    private static final  String USER_MOB="mob";
+    private static final  String USER_PAN="PAN";
+    private static final  String USER_ADHAAR="ADHAAR";
+    private static final  String USER_STATE="STATE";
+    private static final  String USER_CITY="CITY";
+    private static final  String USER_PIN="PIN";
+    private static final  String USER_DOB="DOB";
+    private static final  String USER_Address="ADDRS";
+    private static final  String USER_SCORE="SCORE";
+    private static final  String USER_URL="URL";
+    private static final  String USER_ID="ID";
+    private static final  String USER_TYPE="TYPE";
+    private static final  String USER_INCOME="INCOME";
+    private static final  String USER_ACCOUNT="ACOUNT";
+    private static final  String USER_IFSC="IFSC";
+    private static final  String USER_LOANTYPE="LTYPE";
+    private static final  String USER_LOANAMOUNT="LAMOUNT";
+    private static final  String USER_TERM="TERM";
+    private static final  String USER_ROI="ROI";
+    private static final  String USER_TOTALAMOUNT="TAMNT";
+    private static final  String USER_STATESHORT="STATESHORT";
+
+    private static final String USER_LOGIN_STATUS="status";
+    private static final  String USER_PASS="PASS";
+    private static final String USER_MOBILE_NO = "mobile";
+    private static final String USER_MPIN = "mpin";
+
+
+    private static final String AC_TOKEN = "token";
+    private static final String USER_EMAIL = "email";
+    private static final String USER_ADDRESS = "address";
+    private static final String USER_STATUS = "status";
+    private static final String MEMBER_NO = "member";
+    private static final String ACCOUNTNO = "accountNo";
+    private static final String VIRTUAL_AC_NO = "vartualacno";
+    private static final String VIRTUAL_IFSC = "ifsc";
+    private static final String VIRTUAL_UPI = "virtualUpi";
+
+    public static void setUserPass(Context context,String name){
+        PutString(context,USER_PASS,name);
+    }
+
+
+    public static void setUserMobileNo(Context context, String mobile) {
+        putString(context, USER_MOBILE_NO, mobile);
+    }
+
+    public static String getUserMobileNo(Context context) {
+        return getStringData(context, USER_MOBILE_NO);
+    }
+    public static void setUserMpin(Context context, String mpin) {
+        putString(context, USER_MPIN, mpin);
+    }
+
+
+    public static String getUserMpin(Context context) {
+        return getStringData(context, USER_MPIN);
+    }
+
+    public static void setUserBranchCode(Context context, String mpin) {
+        putString(context, USER_BRANCH_CODE, mpin);}
+
+    public static String getUserBranchCode(Context context) {
+        return getStringData(context, USER_BRANCH_CODE);
+    }
+    private static void putString(Context context, String key, String val) {
+        SharedPreferences preferences = context.getSharedPreferences("SharedPrefarence", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key, val);
+        editor.commit();
+    }
+    private static String getStringData(Context context, String key) {
+        SharedPreferences preferences = context.getSharedPreferences("SharedPrefarence", Context.MODE_PRIVATE);
+        return preferences.getString(key, null);
+    }
+    public static String getUserPass(Context context){
+        return GetString(context,USER_PASS);
+    }
+
+    public static void PutBoolean(Context context, String key, boolean val){
+        SharedPreferences preferences=context.getSharedPreferences("SharedPrefarence",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key,val);
+        editor.commit();
+    }
+    public static boolean GetBoolean(Context context,String key){
+        SharedPreferences preferences=context.getSharedPreferences("SharedPrefarence",Context.MODE_PRIVATE);
+        return preferences.getBoolean(key,false);
+    }
+
+    public static void PutInteger(Context context, String key, int val){
+        SharedPreferences preferences=context.getSharedPreferences("SharedPrefarence",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(key,val);
+        editor.commit();
+    }
+    public static int GetInteger(Context context, String key){
+        SharedPreferences preferences=context.getSharedPreferences("SharedPrefarence",Context.MODE_PRIVATE);
+        return preferences.getInt(key,0);
+    }
+
+    public static void setUserOTP(Context context,int otp){
+        PutInteger(context,USER_OTP,otp);
+    }
+
+    public static Integer getUserOTP(Context context){
+        return GetInteger(context,USER_OTP);
+    }
+
+
+    public static void setUserLoginStatus(Context context,boolean status){
+        PutBoolean(context,USER_LOGIN_STATUS,status);
+    }
+
+    public static boolean getUserLoginStatus(Context context){
+        return GetBoolean(context,USER_LOGIN_STATUS);
+    }
+
+    public static void PutString(Context context,String key,String val){
+        SharedPreferences preferences=context.getSharedPreferences("SharedPrefarence",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key,val);
+        editor.commit();
+    }
+
+    public static String GetString(Context context,String key){
+        SharedPreferences preferences=context.getSharedPreferences("SharedPrefarence",Context.MODE_PRIVATE);
+        return preferences.getString(key,"00/00/0000 00:00:00");
+    }
+
+    public static void setUserName(Context context,String name){
+        PutString(context,USER_NAME,name);
+    }
+
+    public static String getUserName(Context context){
+        return GetString(context,USER_NAME);
+    }
+
+    public static void setUserMob(Context context,String name){
+        PutString(context,USER_MOB,name);
+    }
+
+    public static String getUserMob(Context context){
+        return GetString(context,USER_MOB);
+    }
+
+
+    public static void setUSER_ID(Context context,String name){
+        PutString(context,USER_ID,name);
+    }
+
+    public static String getUSER_ID(Context context){
+        return GetString(context,USER_ID);
+    }
+
+    public static void setUserType(Context context,String name){
+        PutString(context,USER_TYPE,name);
+    }
+
+    public static String getUserType(Context context){
+        return GetString(context,USER_TYPE);
+    }
+
+
+    public static void setUserAccount(Context context,String name){
+        PutString(context,USER_ACCOUNT,name);
+    }
+
+    public static String getUserAccount(Context context){
+        return GetString(context,USER_ACCOUNT);
+    }
+
+    public static void setUserIfsc(Context context,String name){
+        PutString(context,USER_IFSC,name);
+    }
+
+    public static String getUserIfsc(Context context){
+        return GetString(context,USER_IFSC);
+    }
+
+    public static void setUserLoantype(Context context,String name){
+        PutString(context,USER_LOANTYPE,name);
+    }
+
+    public static String getUserLoantype(Context context){
+        return GetString(context,USER_LOANTYPE);
+    }
+
+    public static void setUserLoanamount(Context context,String name){
+        PutString(context,USER_LOANAMOUNT,name);
+    }
+
+    public static String getUserLoanamount(Context context){
+        return GetString(context,USER_LOANAMOUNT);
+    }
+
+    public static void setUserTerm(Context context,String name){
+        PutString(context,USER_TERM,name);
+    }
+
+    public static String getUserTerm(Context context){
+        return GetString(context,USER_TERM);
+    }
+
+    public static void setUserRoi(Context context,String name){
+        PutString(context,USER_ROI,name);
+    }
+
+    public static String getUserRoi(Context context){
+        return GetString(context,USER_ROI);
+    }
+
+    public static void setUserTotalamount(Context context,String name){
+        PutString(context,USER_TOTALAMOUNT,name);
+    }
+
+    public static String getUserTotalamount(Context context){
+        return GetString(context,USER_TOTALAMOUNT);
+    }
+
+    public static void setLastLoginDate(Context context,String LlginDt){
+        PutString(context,Booking_Month,LlginDt);
+    }
+
+    public static String getLastLoginDate(Context context){
+        return GetString(context,Booking_Month);
+    }
+
+    public static void setUserBranch(Context context,String LlginDt){
+        PutString(context,USER_BRANCH,LlginDt);
+    }
+
+    public static String getUserBranch(Context context){
+        return GetString(context,USER_BRANCH);
+    }
+
+
+
+
+    private static String getStringDataEmpty(Context context, String key) {
+        SharedPreferences preferences = context.getSharedPreferences("SharedPrefarence", Context.MODE_PRIVATE);
+        return preferences.getString(key, "");
+    }
+
+    public static void setToken(Context context, String token) {
+        putString(context, AC_TOKEN, token);
+    }
+
+    public static String getToken(Context context) {
+        return getStringDataEmpty(context, AC_TOKEN);
+    }
+
+    public static void setUserAddress(Context context, String address) {
+        putString(context, USER_ADDRESS, address);
+    }
+
+    public static String getUserAddress(Context context) {
+        return getStringData(context, USER_ADDRESS);
+    }
+
+
+    public static void setUserEmail(Context context, String email) {
+        putString(context, USER_EMAIL, email);
+    }
+
+    public static String getUserEmail(Context context) {
+        return getStringData(context, USER_EMAIL);
+    }
+
+    public static void setUserStatus(Context context, String status) {
+        putString(context, USER_STATUS, status);
+    }
+
+    public static String getUserStatus(Context context) {
+        return getStringData(context, USER_STATUS);
+    }
+    public static void setMemberNo(Context context, String memberNo) {
+        putString(context, MEMBER_NO, memberNo);
+    }
+
+    public static String getMemberNo(Context context) {
+        return getStringData(context, MEMBER_NO);
+    }
+
+    public static void setAccountno(Context context, String acNo) {
+        putString(context, ACCOUNTNO, acNo);
+    }
+
+    public static String getAccountno(Context context) {
+        return getStringData(context, ACCOUNTNO);
+    }
+
+    public static void setVirtualAcNo(Context context, String vAcNO) {
+        putString(context, VIRTUAL_AC_NO, vAcNO);
+    }
+
+    public static String getVirtualAcNo(Context context) {
+        return getStringData(context, VIRTUAL_AC_NO);
+    }
+
+    public static void setVirtualIfsc(Context context, String vIfsc) {
+        putString(context, VIRTUAL_IFSC, vIfsc);
+    }
+
+    public static String getVirtualIfsc(Context context) {
+        return getStringData(context, VIRTUAL_IFSC);
+    }
+
+    public static void setVirtualUpi(Context context, String vUpi) {
+        putString(context, VIRTUAL_UPI, vUpi);
+    }
+
+    public static String getVirtualUpi(Context context) {
+        return getStringData(context, VIRTUAL_UPI);
+    }
+
+}
